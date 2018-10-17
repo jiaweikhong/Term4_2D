@@ -1,8 +1,9 @@
 package sat;
 
-import com.sun.org.apache.xpath.internal.operations.Neg;
-
+import immutable.EmptyImList;
 import immutable.ImList;
+import java.util.Iterator;
+
 import sat.env.Bool;
 import sat.env.Environment;
 import sat.formula.Clause;
@@ -26,8 +27,9 @@ public class SATSolver {
      */
     public static Environment solve(Formula formula) {
         // TODO: implement this.
-        System.out.println("Solve(1) has begun");
-        return solve(formula.getClauses(), new Environment());
+        System.out.println("solve(formula) has begun");
+        return solve(formula.getClauses(), new Environment());      //calls solve(clauses, env)
+
         //throw new RuntimeException("not yet implemented.");
     }
 
@@ -45,85 +47,99 @@ public class SATSolver {
      */
     private static Environment solve(ImList<Clause> clauses, Environment env) {
         // TODO: implement this.
+        System.out.println("solve(clauses, env) has begun");
 
-        System.out.println("Solve(2) has begun");
-        if (clauses.isEmpty()) {
-            System.out.println("List of clauses is empty");
+
+        // Data:
+        Clause emptyClause = new Clause();      // used to check for an empty clause
+        int i = 1;          // a counter to check for size of clause
+        boolean contloop = true;
+
+        // Case 1:
+        if (clauses.isEmpty()){         // checking if there are no clauses left.
+            System.out.println("Case 1: There are no clauses left (yay!), returning environment");
             return env;
         }
+
+        // Case 2:
+        else if (clauses.contains(emptyClause)){        // checking if there are any clauses which are empty.
+            System.out.println("Case 2: There is an empty clause (aka failure), trying to backtrack now.");
+            //insert backtracking code here.
+            return null;    // returning null cause this Problem can't be solved.
+        }
+
+        // Case 3:
         else {
-            System.out.println("Now we iterate through the clauses in the list of clauses");
-            java.util.Iterator<Clause> iter = clauses.iterator();
-            while (iter.hasNext()) {
-                Clause innerClause = iter.next();
-                System.out.println(innerClause);
+            System.out.println("Case 3: this should happen pretty often");
 
-                if (innerClause.size() == 1) {
-                    System.out.println("I found a clause whose size is 1.");
-                    Literal innerLiteral = innerClause.chooseLiteral();
-                    ImList<Clause> newClauses = substitute(clauses, innerLiteral);
-                    if (innerLiteral instanceof PosLiteral) {
-                        env.putTrue(innerLiteral.getVariable());
-                    }
-                    else {
-                        env.putFalse(innerLiteral.getVariable());
-                    }
-                    System.out.println(env);
-                    return solve(newClauses, env);
-                }
+            while (contloop) {
 
+                Iterator<Clause> clauseIter = clauses.iterator();   // creates an iterator for ImList<Clause>
 
-            System.out.println("Couldn't find a clause whose size is 1. Continuing to find min size.");
-            boolean continueloop = true;
-            for (int i = 2; continueloop; i++) {
+                while (clauseIter.hasNext()){
 
+                    System.out.println("Now checking if a clause is size i...");
+                    Clause currentClause = clauseIter.next();
 
-                java.util.Iterator<Clause> iter2 = clauses.iterator();
-                while (iter2.hasNext()) {
-                    if (innerClause.size() == i){
-                        System.out.println("I found a clause with size " + i);
-                        Literal newLiteral = innerClause.chooseLiteral();   // defines newLiteral as a random literal in the innerclause.
-                        System.out.println("I am going to call substitute now");
-                        ImList<Clause> newClauses = substitute(clauses, newLiteral);
-                        System.out.println(newClauses);
-                        for (Clause aClause: newClauses) {
-                            if (aClause.isEmpty()){
-                                newClauses = substitute(clauses, newLiteral.getNegation());
-                                for (Clause bClause: newClauses){
-                                    if (bClause.isEmpty()){
-                                        env = null;
-                                        return env;
-                                    }
-                                    else {
-                                        if (newLiteral instanceof PosLiteral) {
-                                            env.putFalse(newLiteral.getVariable());
-                                        }
-                                        else {
-                                            env.putTrue(newLiteral.getVariable());
-                                        }
-                                        continueloop = false;
-                                        return solve(newClauses, env);
-                                    }
-                                }
+                    if (currentClause.size() == i){         // checks if the size of the clause is i.
+
+                        System.out.println("I found a clause whose size is " + i);
+
+                        contloop = false;       // prevent this loop from happening again.
+
+                        Literal chosenLit = currentClause.chooseLiteral();      // chooses a random literal from the clause
+
+                        if (chosenLit instanceof PosLiteral) {      // if the chosen lit is positive, put itself into the environment.
+                            env = env.putTrue(chosenLit.getVariable());
+                            System.out.println("Environment has been updated!");
+                        }
+                        else {                                      // if the chosen lit is negative, put its negation into the environment.
+                            env = env.putFalse(chosenLit.getVariable());
+                            System.out.println("Environment has been updated!");
+                        }
+
+                        System.out.println("Current env: " + env);
+
+                        System.out.println("Calling substitute now");
+                        ImList<Clause> newclauses = substitute(clauses, chosenLit);     // calls substitute
+                        System.out.println("newclauses: " + newclauses);
+
+                        i = 1;
+
+                        Environment output = solve(newclauses, env);
+
+                        if ((output == null) && (chosenLit instanceof PosLiteral)){
+                            Literal negatedChosenLit = chosenLit.getNegation();
+                            if (chosenLit instanceof PosLiteral) {
+                                env = env.putFalse(chosenLit.getVariable());
+                                System.out.println("Environment has been updated!");
                             }
                             else {
-                                if (newLiteral instanceof PosLiteral) {
-                                    env.putTrue(newLiteral.getVariable());
-                                }
-                                else {
-                                    env.putFalse(newLiteral.getVariable());
-                                }
-                                continueloop = false;
-                                System.out.println(env);
-                                return solve(newClauses, env);
+                                env = env.putTrue(chosenLit.getVariable());
+                                System.out.println("Environment has been updated!");
                             }
+                            System.out.println("Calling substitute now");
+                            ImList<Clause> newerclauses = substitute(clauses, negatedChosenLit);
+                            return solve(newerclauses, env);
+                        }
+                        else if ((output == null) && (chosenLit instanceof NegLiteral)){
+                            return null;
+                        }
+
+                        else {
+                            return solve(newclauses, env);
                         }
                     }
                 }
+                i += 1;
+                System.out.println("value of i: " + i);
             }
-            }
-            return env; // this shld not happen.
         }
+
+
+
+        System.out.println("this shldnt happen at all");
+        return null;
         //throw new RuntimeException("not yet implemented.");
     }
 
@@ -141,28 +157,40 @@ public class SATSolver {
             Literal l) {
         // TODO: implement this.
 
-        if (clauses.isEmpty()){
-            return null;
-        }
+        //System.out.println(clauses);
+        // declare ImList as output first
+        ImList<Clause> output = new EmptyImList<>();
+        Iterator<Clause> iterCl = clauses.iterator();
 
-        else{
-            while (clauses.iterator().hasNext()){
-                Clause currentClause = clauses.iterator().next();
+        // iterate on Clauses
+        while (iterCl.hasNext()) {
+            Clause eachC = iterCl.next();
+            boolean containL = false;
+            boolean containNotL = false;
+            Iterator<Literal> iterLi = eachC.iterator();
 
-                while (currentClause.iterator().hasNext()){
-                    Literal currentLiteral = currentClause.iterator().next();
-
-                    if (currentLiteral.negates(l)){    //checks if the literal being checked is the negation of l.
-                        currentClause.reduce(l.getNegation());  //not 100% sure   //supposed to remove the literal itself.
-                    }
-                    else if (currentLiteral.equals(l)){    //checks if the literal being checked is equal to l.
-                        clauses.remove(currentClause);  //removes the whole "clauses".
-                    }
+            // iterate on literal
+            while (iterLi.hasNext()) {
+                Literal eachL = iterLi.next();
+                if (eachL == l) {
+                    containL = true;
+                } else if (eachL.negates(l)) {
+                    containNotL = true;
                 }
             }
-        }
 
-        return clauses;
+            // adding Clause or not
+            if (containL) {
+                ;
+            } else {
+                if (containNotL) {
+                    eachC = eachC.reduce(l);
+                    //System.out.println(eachC);
+                }
+                output = output.add(eachC);
+            }
+        }
+        return output;
 
         //throw new RuntimeException("not yet implemented.");
     }
