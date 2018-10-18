@@ -28,7 +28,7 @@ public class SATSolverTest {
 
         try
         {
-            File file = new File("C:\\Users\\khong\\Documents\\Term 4 2D\\50.001-20181016T022158Z-001\\50.001\\project-2d-starting\\sampleCNF\\largeUnsat.cnf");
+            File file = new File("C:\\Users\\faith\\Desktop\\project-2d-starting\\sampleCNF\\largeSat.cnf");
             reader = new BufferedReader(new FileReader(file));
 
             String line;
@@ -78,7 +78,7 @@ public class SATSolverTest {
 
             long time = System.nanoTime();
             long timeTaken = time - started;
-            System.out.println("time:" + timeTaken/1000000.0 + "ms");
+            System.out.println("time " + timeTaken/1000000.0 + "ms");
 
             if (answer != null){
                 System.out.println("satisfiable");
@@ -105,11 +105,12 @@ public class SATSolverTest {
                 retstring = retstring.replace(", ","\n");
                 writer.write(retstring);
                 writer.close();
-
             }
+
             else {
                 System.out.println("not satisfiable");
             }
+
         }
         catch (IOException exc){
             exc.printStackTrace();
@@ -117,15 +118,17 @@ public class SATSolverTest {
         }
     }
 
+
     public void testSATSolver1(){
         Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
     }
+
 
     public void testSATSolver2(){
         Environment e = SATSolver.solve(makeFm(makeCl(na)));
     }
 
-    private static Formula makeFm(Clause... e) {
+    public static Formula makeFm(Clause... e) {
         Formula f = new Formula();
         for (Clause c : e) {
             f = f.addClause(c);
@@ -133,7 +136,7 @@ public class SATSolverTest {
         return f;
     }
 
-    private static Clause makeCl(Literal... e) {
+    public static Clause makeCl(Literal... e) {
         Clause c = new Clause();
         for (Literal l : e) {
             c = c.add(l);
