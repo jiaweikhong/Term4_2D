@@ -81,6 +81,7 @@ public class MyClass {
 //        Clause bt7 = SATSolverTest.makeCl(e, nc, nd);
 
         Formula btformula = SATSolverTest.makeFm(bt2, bt3, bt4, bt5, bt6, bt1);
+        System.out.println(btformula);
 
         System.out.println("SAT solver starts!");
         long started = System.nanoTime();

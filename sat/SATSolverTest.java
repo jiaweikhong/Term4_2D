@@ -38,7 +38,7 @@ public class SATSolverTest {
 
         try
         {
-            File file = new File("C:\\Users\\khong\\Documents\\Term 4 2D\\50.001-20181016T022158Z-001\\50.001\\project-2d-starting\\sampleCNF\\largeSat.cnf");
+            File file = new File("C:\\Users\\khong\\Documents\\Term 4 2D\\50.001-20181016T022158Z-001\\50.001\\project-2d-starting\\sampleCNF\\largeUnsat.cnf");
             System.out.println("File path as parameter provided");
             reader = new BufferedReader(new FileReader(file));
             System.out.println("File open successful!");
@@ -51,6 +51,11 @@ public class SATSolverTest {
                 }
                 //System.out.println(line)
                 //line = line.replace("\r", " ").replace("\n", " ");
+
+                if (line.isEmpty()){
+                    continue;
+                }
+
                 String[] lits = line.split("\\s+");
 
 //                System.out.println(lits);
@@ -86,7 +91,7 @@ public class SATSolverTest {
             }
             makeFm(clauseArray.toArray(new Clause[clauseArray.size()]));
             Formula formula = makeFm(clauseArray.toArray(new Clause[clauseArray.size()]));
-            System.out.println(makeFm(clauseArray.toArray(new Clause[clauseArray.size()])));
+//            System.out.println(makeFm(clauseArray.toArray(new Clause[clauseArray.size()])));
 
             System.out.println("SAT solver starts!");
             long started = System.nanoTime();
