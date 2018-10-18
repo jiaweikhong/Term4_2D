@@ -1,19 +1,15 @@
 package sat;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
-/*
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-*/
 
 import sat.env.*;
 import sat.formula.*;
-
 
 public class SATSolverTest {
     Literal a = PosLiteral.make("a");
@@ -23,34 +19,23 @@ public class SATSolverTest {
     Literal nb = b.getNegation();
     Literal nc = c.getNegation();
 
-
-
-	
-	// TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
-
     public static void main(String[] args)
     {
         BufferedReader reader = null;
         int noOfVar = 0;
         ArrayList<Literal> tempLits = new ArrayList<>();
         ArrayList<Clause> clauseArray = new ArrayList<>();
-//        Formula formula = new Formula();
 
         try
         {
             File file = new File("C:\\Users\\khong\\Documents\\Term 4 2D\\50.001-20181016T022158Z-001\\50.001\\project-2d-starting\\sampleCNF\\largeUnsat.cnf");
-            System.out.println("File path as parameter provided");
             reader = new BufferedReader(new FileReader(file));
-            System.out.println("File open successful!");
 
             String line;
-            System.out.println("Printing file contents...");
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("p") || line.startsWith("c")){
                     continue;
                 }
-                //System.out.println(line)
-                //line = line.replace("\r", " ").replace("\n", " ");
 
                 if (line.isEmpty()){
                     continue;
@@ -58,21 +43,15 @@ public class SATSolverTest {
 
                 String[] lits = line.split("\\s+");
 
-//                System.out.println(lits);
                 for (String s : lits) {
 
-
-//                    String[] hello = new String[0];
                     if (!s.startsWith("\\s+")) {
                         if (s.startsWith("p") || s.startsWith("c")) {
                             continue;
                         }
                         else {
-                            //System.out.println(s);
                             if (!s.equals("0")) {
-                                //System.out.println(s);
                                 if (s.charAt(0) == '-') {
-                                    // System.out.println(s);
                                     String newS = s.substring(1);
                                     tempLits.add(NegLiteral.make(newS));
                                 }
@@ -91,24 +70,46 @@ public class SATSolverTest {
             }
             makeFm(clauseArray.toArray(new Clause[clauseArray.size()]));
             Formula formula = makeFm(clauseArray.toArray(new Clause[clauseArray.size()]));
-//            System.out.println(makeFm(clauseArray.toArray(new Clause[clauseArray.size()])));
 
-            System.out.println("SAT solver starts!");
+            System.out.println("SAT solver starts!!!");
             long started = System.nanoTime();
 
             Environment answer = SATSolver.solve(formula);
 
             long time = System.nanoTime();
             long timeTaken = time - started;
-            System.out.println("time " + timeTaken/1000000.0 + "ms");
+            System.out.println("time:" + timeTaken/1000000.0 + "ms");
 
             if (answer != null){
                 System.out.println("satisfiable");
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter("BoolAssignment.txt"));
+                String stringAns = answer.toString();
+                stringAns = stringAns.replace("->",":");
+                stringAns = stringAns.replace("Environment:["," ");
+                stringAns = stringAns.replace("]","");
+                String[] slist = stringAns.split(",");
+                String[] slist2 = new String[slist.length];
+
+                for (int i = 1; i <= slist.length ; i++) {
+                    for (String s : slist){
+                        if (s.contains(" " + i + ":")){
+                            slist2[i-1] = s.replace(" ", "");
+                        }
+                    }
+                }
+
+                String retstring = Arrays.toString(slist2);
+                retstring = retstring.replace("[","");
+                retstring = retstring.replace("]","");
+                retstring = retstring.replace(", ","\n");
+                writer.write(retstring);
+                writer.close();
+
             }
             else {
-                System.out.println("unsatisfiable");
+                System.out.println("not satisfiable");
             }
-
         }
         catch (IOException exc){
             exc.printStackTrace();
@@ -116,43 +117,27 @@ public class SATSolverTest {
         }
     }
 
-	
     public void testSATSolver1(){
-    	// (a v b)
-    	Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
-/*
-    	assertTrue( "one of the literals should be set to true",
-    			Bool.TRUE == e.get(a.getVariable())  
-    			|| Bool.TRUE == e.get(b.getVariable())	);
-    	
-*/    	
+        Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
     }
-    
-    
+
     public void testSATSolver2(){
-    	// (~a)
-    	Environment e = SATSolver.solve(makeFm(makeCl(na)));
-/*
-    	assertEquals( Bool.FALSE, e.get(na.getVariable()));
-*/    	
+        Environment e = SATSolver.solve(makeFm(makeCl(na)));
     }
-    
-    public static Formula makeFm(Clause... e) {
+
+    private static Formula makeFm(Clause... e) {
         Formula f = new Formula();
         for (Clause c : e) {
             f = f.addClause(c);
         }
         return f;
     }
-    
-    public static Clause makeCl(Literal... e) {
+
+    private static Clause makeCl(Literal... e) {
         Clause c = new Clause();
         for (Literal l : e) {
             c = c.add(l);
         }
         return c;
     }
-    
-    
-    
 }
