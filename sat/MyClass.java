@@ -72,22 +72,22 @@ public class MyClass {
         f2 = f2.addClause(c7);
         f2 = f2.addClause(c8);
 
-        Clause bt1 = SATSolverTest.makeCl(b, a);
-        Clause bt2 = SATSolverTest.makeCl(na, c, d);
-        Clause bt3 = SATSolverTest.makeCl(nc, nd);
-        Clause bt4 = SATSolverTest.makeCl(nc, d);
-        Clause bt5 = SATSolverTest.makeCl(c, nd);
-        Clause bt6 = SATSolverTest.makeCl(nb, nc, nd);
-//        Clause bt7 = SATSolverTest.makeCl(e, nc, nd);
-
-        Formula btformula = SATSolverTest.makeFm(bt2, bt3, bt4, bt5, bt6, bt1);
-        System.out.println(btformula);
+//        Clause bt1 = SATSolverTest.makeCl(b, a);
+//        Clause bt2 = SATSolverTest.makeCl(na, c, d);
+//        Clause bt3 = SATSolverTest.makeCl(nc, nd);
+//        Clause bt4 = SATSolverTest.makeCl(nc, d);
+//        Clause bt5 = SATSolverTest.makeCl(c, nd);
+//        Clause bt6 = SATSolverTest.makeCl(nb, nc, nd);
+////        Clause bt7 = SATSolverTest.makeCl(e, nc, nd);
+//
+//        Formula btformula = SATSolverTest.makeFm(bt2, bt3, bt4, bt5, bt6, bt1);
+//        System.out.println(btformula);
 
         System.out.println("SAT solver starts!");
         long started = System.nanoTime();
 
 //        System.out.println(btformula);
-        System.out.println(SATSolver.solve(btformula));
+//        System.out.println(SATSolver.solve(btformula));
         //System.out.println(SATSolver.substitute(f.getClauses(),d));
 
 

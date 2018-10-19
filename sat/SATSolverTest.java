@@ -28,13 +28,17 @@ public class SATSolverTest {
 
         try
         {
-            File file = new File("C:\\Users\\faith\\Desktop\\project-2d-starting\\sampleCNF\\largeSat.cnf");
+            File file = new File("C:\\Users\\khong\\Documents\\Term 4 2D\\50.001-20181016T022158Z-001\\50.001\\project-2d-starting\\sampleCNF\\s8Sat.cnf");
             reader = new BufferedReader(new FileReader(file));
 
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("p") || line.startsWith("c")){
                     continue;
+                }
+
+                if (line.startsWith(" ")){
+                    line = line.trim();
                 }
 
                 if (line.isEmpty()){
@@ -128,7 +132,7 @@ public class SATSolverTest {
         Environment e = SATSolver.solve(makeFm(makeCl(na)));
     }
 
-    public static Formula makeFm(Clause... e) {
+    private static Formula makeFm(Clause... e) {
         Formula f = new Formula();
         for (Clause c : e) {
             f = f.addClause(c);
@@ -136,7 +140,7 @@ public class SATSolverTest {
         return f;
     }
 
-    public static Clause makeCl(Literal... e) {
+    private static Clause makeCl(Literal... e) {
         Clause c = new Clause();
         for (Literal l : e) {
             c = c.add(l);
